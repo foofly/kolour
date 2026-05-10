@@ -1,0 +1,8 @@
+[Containments][27]
+ItemsGeometriesHorizontal=
+
+[Containments][27][Wallpaper][org.kde.image][General]
+Image=file:///home/example/Pictures/wall.jpg
+
+[Containments][27][General]
+ToolBoxButtonState=topcenter

@@ -1,0 +1,19 @@
+/* kolour: Gruvbox-Dark */
+@define-color theme_bg_color #282828;
+@define-color theme_base_color #282828;
+@define-color theme_fg_color #ebdbb2;
+@define-color theme_text_color #ebdbb2;
+@define-color theme_selected_bg_color #665c54;
+@define-color theme_selected_fg_color #ebdbb2;
+@define-color theme_unfocused_bg_color #3c3836;
+@define-color theme_unfocused_fg_color #a89984;
+@define-color insensitive_bg_color #3c3836;
+@define-color insensitive_fg_color #a89984;
+@define-color borders #3c3836;
+@define-color accent_color #fabd2f;
+@define-color accent_bg_color #fabd2f;
+@define-color accent_fg_color #ebdbb2;
+@define-color destructive_color #fb4934;
+@define-color success_color #b8bb26;
+@define-color warning_color #fe8019;
+@define-color error_color #fb4934;

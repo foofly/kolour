@@ -1,0 +1,19 @@
+/* kolour: Sweet */
+@define-color theme_bg_color #161320;
+@define-color theme_base_color #1a1626;
+@define-color theme_fg_color #e1e3e4;
+@define-color theme_text_color #e1e3e4;
+@define-color theme_selected_bg_color #c574dd;
+@define-color theme_selected_fg_color #161320;
+@define-color theme_unfocused_bg_color #1f1b2e;
+@define-color theme_unfocused_fg_color #9b8baf;
+@define-color insensitive_bg_color #1f1b2e;
+@define-color insensitive_fg_color #9b8baf;
+@define-color borders #1f1b2e;
+@define-color accent_color #c574dd;
+@define-color accent_bg_color #c574dd;
+@define-color accent_fg_color #161320;
+@define-color destructive_color #f28fad;
+@define-color success_color #abe9b3;
+@define-color warning_color #fae3b0;
+@define-color error_color #f28fad;

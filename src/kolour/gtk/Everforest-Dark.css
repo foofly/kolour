@@ -1,0 +1,19 @@
+/* kolour: Everforest-Dark */
+@define-color theme_bg_color #2d353b;
+@define-color theme_base_color #2d353b;
+@define-color theme_fg_color #d3c6aa;
+@define-color theme_text_color #d3c6aa;
+@define-color theme_selected_bg_color #475258;
+@define-color theme_selected_fg_color #d3c6aa;
+@define-color theme_unfocused_bg_color #343f44;
+@define-color theme_unfocused_fg_color #859289;
+@define-color insensitive_bg_color #343f44;
+@define-color insensitive_fg_color #859289;
+@define-color borders #343f44;
+@define-color accent_color #7fbbb3;
+@define-color accent_bg_color #7fbbb3;
+@define-color accent_fg_color #d3c6aa;
+@define-color destructive_color #e67e80;
+@define-color success_color #a7c080;
+@define-color warning_color #dbbc7f;
+@define-color error_color #e67e80;

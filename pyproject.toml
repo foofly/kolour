@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kolour"
+version = "0.1.0"
+description = "Quick KDE Plasma colour-scheme switcher with curated palettes and Material You via matugen."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "bill" }]
+keywords = ["kde", "plasma", "color-scheme", "theme", "matugen"]
+classifiers = [
+    "Environment :: X11 Applications :: KDE",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = []
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.6"]
+dev = ["pytest>=7", "PyYAML>=6"]
+
+[project.scripts]
+kolour = "kolour.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kolour = [
+    "gui/resources/*.svg",
+    "themes/**/*.colors",
+    "themes/**/LICENSE",
+    "konsole/*.colorscheme",
+    "gtk/*.css",
+    "matugen-templates/*",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
