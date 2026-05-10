@@ -1,6 +1,6 @@
 app-id: io.github.foofly.kolour
 runtime: org.kde.Platform
-runtime-version: '6.7'
+runtime-version: '6.10'
 sdk: org.kde.Sdk
 command: kolour-launcher
 
@@ -21,10 +21,20 @@ finish-args:
   - --device=dri
 
 modules:
+  - name: pyside6
+    buildsystem: simple
+    build-options:
+      # PySide6 isn't in org.kde.Platform — pull wheels from PyPI at build time.
+      # For Flathub submission this would be replaced with flatpak-pip-generator
+      # output (offline, pinned SHAs).
+      build-args:
+        - --share=network
+    build-commands:
+      - pip3 install --prefix=/app --no-cache-dir 'PySide6>=6.6'
+
   - name: kolour
     buildsystem: simple
     build-commands:
-      # PySide6 is provided by org.kde.Platform 6.x — no pip install needed.
       - install -d /app/lib/kolour /app/bin /app/share/applications /app/share/metainfo /app/share/icons/hicolor/scalable/apps /app/share/kolour
       - cp -r src/kolour /app/lib/kolour/
       - install -m 0755 flatpak/kolour-launcher /app/bin/kolour-launcher

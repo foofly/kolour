@@ -129,7 +129,7 @@ A Flatpak manifest lives under `flatpak/`. kolour is unusual for a Flatpak: it's
 Build + install locally:
 
 ```sh
-make flatpak-install     # needs flatpak-builder; pulls org.kde.{Platform,Sdk}//6.7
+make flatpak-install     # needs flatpak-builder; pulls org.kde.{Platform,Sdk}//6.10
 make flatpak-run         # launches the GUI
 ```
 
