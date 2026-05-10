@@ -3,13 +3,12 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
-import shutil
 import subprocess
 from pathlib import Path
 from typing import Literal
 
 from . import apply as apply_mod
-from . import state
+from . import host, state
 
 DEFAULT_LIGHT_AFTER = "06:00"
 DEFAULT_DARK_AFTER = "18:00"
@@ -89,7 +88,7 @@ def toggle(*, dry_run: bool = False) -> apply_mod.ApplyResult:
 # --- systemd user timer ---------------------------------------------------
 
 def _kolour_binary() -> str:
-    return shutil.which("kolour") or "kolour"
+    return host.which("kolour") or "kolour"
 
 
 def install_timer(*, light_after: str | None = None, dark_after: str | None = None) -> list[str]:
@@ -140,7 +139,7 @@ def disable_timer() -> list[str]:
 
 def timer_status() -> str:
     try:
-        out = subprocess.run(
+        out = host.run(
             ["systemctl", "--user", "is-active", TIMER_NAME],
             capture_output=True, text=True, check=False,
         )
@@ -151,7 +150,7 @@ def timer_status() -> str:
 
 def _systemctl(args: list[str]) -> list[str]:
     try:
-        subprocess.run(["systemctl", "--user", *args], check=True, capture_output=True)
+        host.run(["systemctl", "--user", *args], check=True, capture_output=True)
         return [f"systemctl --user {' '.join(args)}"]
     except FileNotFoundError:
         return ["WARN: systemctl not on PATH"]

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=kolour
+GenericName=Colour Scheme Manager
+Comment=Quick KDE Plasma colour-scheme switcher
+Exec=kolour-launcher gui
+Icon=io.github.foofly.kolour
+Terminal=false
+Categories=Qt;KDE;Settings;DesktopSettings;
+Keywords=colour;color;theme;scheme;plasma;kde;
+StartupNotify=true
+StartupWMClass=kolour

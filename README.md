@@ -122,6 +122,22 @@ Set `KOLOUR_LOG=DEBUG` (or `INFO` / `WARNING`) before launching to control verbo
 KOLOUR_LOG=DEBUG kolour gui 2>~/kolour.log
 ```
 
+## Flatpak (experimental)
+
+A Flatpak manifest lives under `flatpak/`. kolour is unusual for a Flatpak: it's a system-administration tool, so every host call (KDE binaries, D-Bus, systemd) escapes the sandbox via `flatpak-spawn --host`. The Flatpak gives you distribution and a desktop entry, not security isolation.
+
+Build + install locally:
+
+```sh
+make flatpak-install     # needs flatpak-builder; pulls org.kde.{Platform,Sdk}//6.7
+make flatpak-run         # launches the GUI
+```
+
+Caveats:
+- `matugen` must be installed on the host (the sandbox can't bundle it usefully — it'd run inside the sandbox without access to the host's wallpaper file).
+- The bundled `.colors` files are copied into `~/.local/share/color-schemes/` on first apply (instead of symlinked) so they remain reachable when the Flatpak is uninstalled or upgraded.
+- Flathub submission would need a real icon (the bundled SVG is a placeholder), screenshots, AppStream validation, and a maintained release tag — out of scope for the initial drop.
+
 ## Theme attribution
 
 Each `src/kolour/themes/<theme>/LICENSE` cites the upstream palette source. kolour's own code is MIT.

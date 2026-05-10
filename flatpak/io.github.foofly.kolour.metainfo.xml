@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.foofly.kolour</id>
+  <name>kolour</name>
+  <summary>Quick KDE Plasma colour-scheme switcher</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer_name>foofly</developer_name>
+  <description>
+    <p>
+      kolour swaps the active KDE Plasma colour scheme between curated palettes
+      (Nord, Catppuccin, Everforest, Sweet, Dracula, Gruvbox, Tokyo Night) plus
+      a Material You palette generated from the current wallpaper via matugen.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>PySide6 GUI with theme list, swatch preview, and accent picker.</li>
+      <li>CLI for scripted swaps and global shortcuts.</li>
+      <li>Konsole live-reload over D-Bus.</li>
+      <li>Dark/light auto-follow with a systemd user timer.</li>
+      <li>Optional Look-and-Feel switch so themes apply system-wide.</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.foofly.kolour.desktop</launchable>
+  <provides>
+    <binary>kolour</binary>
+  </provides>
+  <url type="homepage">https://github.com/foofly/kolour</url>
+  <url type="bugtracker">https://github.com/foofly/kolour/issues</url>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-05-10">
+      <description>
+        <p>Initial release.</p>
+      </description>
+    </release>
+  </releases>
+  <categories>
+    <category>Settings</category>
+    <category>DesktopSettings</category>
+  </categories>
+</component>

@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import gtk as gtk_mod
+from . import host
 from . import konsole as konsole_mod
 from . import lookandfeel as lnf_mod
 from . import registry, state
@@ -26,7 +27,7 @@ class ApplyResult:
 
 def current_scheme() -> str | None:
     try:
-        out = subprocess.run(
+        out = host.run(
             ["kreadconfig6", "--file", "kdeglobals", "--group", "General", "--key", "ColorScheme"],
             capture_output=True, text=True, check=True,
         ).stdout.strip()
@@ -37,16 +38,22 @@ def current_scheme() -> str | None:
 
 
 def _ensure_linked(theme: registry.Theme, *, dry_run: bool) -> str | None:
-    """Symlink the bundled .colors into ~/.local/share/color-schemes/ if missing.
-    System-installed schemes (under /usr/share) need no linking — KDE finds them."""
+    """Make the bundled .colors discoverable to KDE by placing it in
+    ~/.local/share/color-schemes/. System-installed schemes (under /usr/share)
+    need no linking — KDE finds them. Inside a Flatpak sandbox we copy instead
+    of symlinking, since /app/... paths are unreachable from the host."""
     if not theme.colors_path or str(theme.colors_path).startswith("/usr/share"):
         return None
     target = KDE_SCHEMES_DIR / theme.colors_path.name
     if target.exists() or target.is_symlink():
         return None
     if dry_run:
-        return f"would symlink {theme.colors_path} → {target}"
+        verb = "copy" if host.IN_FLATPAK else "symlink"
+        return f"would {verb} {theme.colors_path} → {target}"
     KDE_SCHEMES_DIR.mkdir(parents=True, exist_ok=True)
+    if host.IN_FLATPAK:
+        shutil.copyfile(theme.colors_path, target)
+        return f"copied scheme into {KDE_SCHEMES_DIR}"
     try:
         os.symlink(theme.colors_path, target)
     except OSError:
@@ -100,7 +107,7 @@ def _refresh_kde() -> list[str]:
     for label, cmd in (("KGlobalSettings palette change", palette_changed),
                        ("KWin reconfigure", kwin_reconfigure)):
         try:
-            subprocess.run(cmd, check=False, capture_output=True, timeout=3)
+            host.run(cmd, check=False, capture_output=True, timeout=3)
             actions.append(f"notified {label}")
         except (FileNotFoundError, subprocess.SubprocessError):
             pass
@@ -138,9 +145,9 @@ def apply_theme(
             result.actions.append("would run: " + " ".join(accent_cmd))
     else:
         try:
-            subprocess.run(scheme_cmd, check=True, capture_output=True, text=True)
+            host.run(scheme_cmd, check=True, capture_output=True, text=True)
             if accent_cmd:
-                subprocess.run(accent_cmd, check=True, capture_output=True, text=True)
+                host.run(accent_cmd, check=True, capture_output=True, text=True)
             result.actions.append(f"applied {theme.name}" + (f" (accent {accent})" if accent else ""))
         except FileNotFoundError as e:
             raise RuntimeError("plasma-apply-colorscheme not found on PATH") from e
