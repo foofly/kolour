@@ -17,7 +17,11 @@ IN_FLATPAK = os.path.exists("/.flatpak-info") or "FLATPAK_ID" in os.environ
 
 def host_cmd(args: list[str]) -> list[str]:
     if IN_FLATPAK:
-        return ["flatpak-spawn", "--host", *args]
+        # --directory=$HOME — the sandbox's CWD (typically /app/lib/...) does
+        # not exist on the host, so flatpak-spawn fails to chdir there before
+        # launching unless we point it somewhere real.
+        home = os.environ.get("HOME", "/")
+        return ["flatpak-spawn", f"--directory={home}", "--host", *args]
     return list(args)
 
 
