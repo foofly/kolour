@@ -1,4 +1,0 @@
-#!/bin/sh
-# Make our packaged kolour module importable, then invoke the CLI.
-export PYTHONPATH="/app/lib/kolour${PYTHONPATH:+:$PYTHONPATH}"
-exec python3 -m kolour.cli "$@"

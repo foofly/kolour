@@ -20,7 +20,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-gui = ["PySide6>=6.6"]
+tui = ["textual>=0.50"]
 dev = ["pytest>=7", "PyYAML>=6"]
 
 [project.scripts]
@@ -35,7 +35,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 kolour = [
-    "gui/resources/*.svg",
     "themes/**/*.colors",
     "themes/**/LICENSE",
     "konsole/*.colorscheme",
