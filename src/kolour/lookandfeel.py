@@ -11,7 +11,6 @@ import configparser
 import subprocess
 from pathlib import Path
 
-from . import colors_io, host
 
 # L&F packages that respect the active colour scheme. Anything outside this
 # set will visually override our scheme until it's switched.
@@ -30,7 +29,7 @@ LIGHT_DEFAULT = "org.kde.breeze.desktop"
 
 def current_package() -> str | None:
     try:
-        out = host.run(
+        out = subprocess.run(
             ["kreadconfig6", "--file", "kdeglobals", "--group", "KDE",
              "--key", "LookAndFeelPackage"],
             capture_output=True, text=True, check=True,
@@ -71,7 +70,7 @@ def apply_package(pkg: str, *, dry_run: bool = False) -> str:
     if dry_run:
         return "would run: " + " ".join(cmd)
     try:
-        host.run(cmd, check=True, capture_output=True, text=True)
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
     except FileNotFoundError as e:
         raise RuntimeError("plasma-apply-lookandfeel not found on PATH") from e
     except subprocess.CalledProcessError as e:

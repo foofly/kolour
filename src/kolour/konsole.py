@@ -7,7 +7,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from . import host, state
+from . import state
 from .registry import Theme
 
 KONSOLE_DIR = Path(os.path.expanduser("~/.local/share/konsole"))
@@ -18,7 +18,7 @@ PROFILE_NAMES = ("KolourA", "KolourB")
 
 
 def available() -> bool:
-    return host.which("konsole") is not None or KONSOLE_DIR.exists()
+    return shutil.which("konsole") is not None or KONSOLE_DIR.exists()
 
 
 def _next_profile_name() -> str:
@@ -68,7 +68,7 @@ def apply(theme: Theme, *, dry_run: bool = False) -> list[str]:
         actions.append("would run: " + " ".join(cmd))
     else:
         try:
-            host.run(cmd, check=True)
+            subprocess.run(cmd, check=True)
             actions.append(f"set Konsole DefaultProfile={profile_path.name}")
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             actions.append(f"WARN: could not set Konsole default profile: {e}")
@@ -86,7 +86,7 @@ def apply(theme: Theme, *, dry_run: bool = False) -> list[str]:
 
 def _running_konsole_services() -> list[str]:
     try:
-        out = host.run(
+        out = subprocess.run(
             ["dbus-send", "--session", "--print-reply",
              "--dest=org.freedesktop.DBus", "/org/freedesktop/DBus",
              "org.freedesktop.DBus.ListNames"],
@@ -100,7 +100,7 @@ def _running_konsole_services() -> list[str]:
 def _session_paths(service: str) -> list[str]:
     """Introspect /Sessions/ and return /Sessions/<n> for each child node."""
     try:
-        out = host.run(
+        out = subprocess.run(
             ["dbus-send", "--session", "--print-reply",
              f"--dest={service}", "/Sessions",
              "org.freedesktop.DBus.Introspectable.Introspect"],
@@ -126,7 +126,7 @@ def reload_running_sessions(profile_name: str | None = None) -> list[str]:
     for svc in services:
         for sess in _session_paths(svc):
             try:
-                host.run(
+                subprocess.run(
                     ["dbus-send", "--session", "--type=method_call",
                      f"--dest={svc}", sess,
                      "org.kde.konsole.Session.setProfile",
