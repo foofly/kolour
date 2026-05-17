@@ -1,0 +1,49 @@
+# Maintainer: bill <foofly@gmail.com>
+pkgname=kolour-git
+pkgver=0.1.0.r0.g0000000
+pkgrel=1
+pkgdesc="Quick KDE Plasma colour-scheme switcher with curated palettes, a Textual TUI, and Material You via matugen"
+arch=('any')
+url="https://github.com/foofly/kolour"
+license=('MIT')
+depends=(
+  'python>=3.11'
+  'python-textual'
+  'plasma-workspace'    # plasma-apply-colorscheme, plasma-apply-lookandfeel
+  'kconfig'             # kreadconfig6, kwriteconfig6
+)
+optdepends=(
+  'konsole: terminal colour-scheme propagation'
+  'matugen: Material You theme generation from current wallpaper'
+)
+makedepends=(
+  'git'
+  'python-build'
+  'python-installer'
+  'python-setuptools'
+  'python-wheel'
+)
+provides=('kolour')
+conflicts=('kolour')
+source=("$pkgname::git+$url.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$pkgname"
+  # <pyproject-version>.r<commits-since-init>.g<short-sha>, sorts correctly under pacman.
+  printf "%s.r%s.g%s" \
+    "$(awk -F'"' '/^version[[:space:]]*=/ {print $2; exit}' pyproject.toml)" \
+    "$(git rev-list --count HEAD)" \
+    "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  cd "$pkgname"
+  python -m build --wheel --no-isolation
+}
+
+package() {
+  cd "$pkgname"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/${pkgname%-git}/LICENSE"
+}

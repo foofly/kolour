@@ -44,6 +44,21 @@ The Makefile uninstalls any existing pipx package before reinstalling so
 source-only edits are picked up reliably; `make link-schemes` then symlinks
 each `.colors` file into `~/.local/share/color-schemes/` so KDE finds them.
 
+### Arch Linux
+
+A VCS-style PKGBUILD lives under [`packaging/arch/`](packaging/arch). It
+builds and installs as a real Arch package (`kolour-git`, providing
+`kolour`):
+
+```sh
+cd packaging/arch
+makepkg -si
+```
+
+Uninstall is just `sudo pacman -Rns kolour-git`. See
+[`packaging/arch/README.md`](packaging/arch/README.md) for AUR submission
+notes.
+
 ## Uninstall
 
 ```sh
