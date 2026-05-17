@@ -84,6 +84,24 @@ def preview_theme(name: str, *, accent: str | None = None) -> ApplyResult:
     return result
 
 
+def unlink_bundled_schemes() -> list[str]:
+    """Used by `kolour reset` — remove any files in KDE_SCHEMES_DIR whose name
+    matches a bundled theme. Mirrors `make unlink-schemes` but in Python."""
+    bundled_dir = registry.PKG_ROOT / "themes"
+    if not bundled_dir.is_dir() or not KDE_SCHEMES_DIR.is_dir():
+        return []
+    removed: list[str] = []
+    for colors in bundled_dir.glob("*/*.colors"):
+        link = KDE_SCHEMES_DIR / colors.name
+        if link.exists() or link.is_symlink():
+            try:
+                link.unlink()
+                removed.append(str(link))
+            except OSError:
+                pass
+    return removed
+
+
 def _refresh_kde() -> list[str]:
     """Best-effort signals to nudge running KDE processes to reload colours."""
     actions: list[str] = []

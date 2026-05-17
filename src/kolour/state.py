@@ -49,6 +49,14 @@ def update_auto(*, dark: str | None = None, light: str | None = None,
     return auto
 
 
+def remove() -> bool:
+    """Used by `kolour reset` — delete state.toml. Returns True if it existed."""
+    if STATE_FILE.is_file():
+        STATE_FILE.unlink()
+        return True
+    return False
+
+
 def clear_auto() -> None:
     s = read()
     if "auto" in s:

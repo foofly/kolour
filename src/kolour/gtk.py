@@ -44,7 +44,7 @@ def _ensure_import(colors_css: Path) -> None:
 
 
 def remove() -> list[str]:
-    """Used by `kolour uninstall` to clean up managed files + import lines."""
+    """Used by `kolour reset` to clean up managed files + import lines."""
     actions: list[str] = []
     for gtk_dir in GTK_DIRS:
         managed = gtk_dir / MANAGED_NAME

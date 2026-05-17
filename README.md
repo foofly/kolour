@@ -44,6 +44,23 @@ The Makefile uninstalls any existing pipx package before reinstalling so
 source-only edits are picked up reliably; `make link-schemes` then symlinks
 each `.colors` file into `~/.local/share/color-schemes/` so KDE finds them.
 
+## Uninstall
+
+```sh
+make uninstall            # full clean: invokes `kolour reset` then removes the package
+# Or, step by step:
+kolour reset              # undo system changes; keep ~/.config/kolour/themes/
+kolour reset --purge      # also remove ~/.config/kolour/ entirely
+kolour reset --dry-run    # preview without touching anything
+```
+
+`kolour reset` undoes everything kolour added at apply-time: the auto-follow
+systemd timer, the `KolourA`/`KolourB` Konsole profiles plus copied
+`.colorscheme` files, the managed GTK `kolour.css` + import line, the
+bundled-scheme symlinks under `~/.local/share/color-schemes/`, and
+`~/.config/kolour/state.toml`. User-installed themes (via `kolour install`)
+are preserved unless you pass `--purge`.
+
 ## The TUI
 
 ```sh

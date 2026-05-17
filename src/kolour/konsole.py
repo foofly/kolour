@@ -84,6 +84,42 @@ def apply(theme: Theme, *, dry_run: bool = False) -> list[str]:
     return actions
 
 
+def remove() -> list[str]:
+    """Used by `kolour reset` — delete the managed Kolour{A,B} profile files,
+    any `.colorscheme` files we copied from bundled themes, and clear the
+    DefaultProfile in konsolerc if it points at one of our profiles."""
+    actions: list[str] = []
+    for name in PROFILE_NAMES:
+        p = KONSOLE_DIR / f"{name}.profile"
+        if p.is_file():
+            p.unlink()
+            actions.append(f"removed {p}")
+    bundled_konsole = Path(__file__).resolve().parent / "konsole"
+    if bundled_konsole.is_dir() and KONSOLE_DIR.is_dir():
+        for src in bundled_konsole.glob("*.colorscheme"):
+            dst = KONSOLE_DIR / src.name
+            if dst.is_file():
+                dst.unlink()
+                actions.append(f"removed {dst}")
+    try:
+        out = subprocess.run(
+            ["kreadconfig6", "--file", "konsolerc",
+             "--group", "Desktop Entry", "--key", "DefaultProfile"],
+            capture_output=True, text=True, check=False,
+        ).stdout.strip()
+        if out in {f"{n}.profile" for n in PROFILE_NAMES}:
+            subprocess.run(
+                ["kwriteconfig6", "--file", "konsolerc",
+                 "--group", "Desktop Entry", "--key", "DefaultProfile",
+                 "--delete"],
+                check=False, capture_output=True,
+            )
+            actions.append("cleared Konsole DefaultProfile (was kolour-managed)")
+    except FileNotFoundError:
+        pass
+    return actions
+
+
 def _running_konsole_services() -> list[str]:
     try:
         out = subprocess.run(

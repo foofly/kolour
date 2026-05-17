@@ -37,7 +37,10 @@ unlink-schemes:
 	done
 	@echo "Removed kolour-managed schemes from $(SCHEME_DIR)"
 
-uninstall: unlink-schemes
+uninstall:
+	@# Thorough clean via `kolour reset` if it's on PATH; otherwise fall
+	@# back to the shell-only unlink-schemes target.
+	-command -v kolour >/dev/null 2>&1 && kolour reset || $(MAKE) unlink-schemes
 	pipx uninstall kolour 2>/dev/null || $(PYTHON) -m pip uninstall -y kolour
 
 test:

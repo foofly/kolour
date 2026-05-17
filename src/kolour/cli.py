@@ -239,6 +239,69 @@ def cmd_reload_konsole(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_reset(args: argparse.Namespace) -> int:
+    """Undo kolour's system-level changes: timer, GTK CSS, Konsole profiles,
+    bundled scheme symlinks, and state.toml. With --purge, also wipe the
+    whole ~/.config/kolour/ tree (including any themes installed via
+    `kolour install`)."""
+    actions: list[str] = []
+    dry = args.dry_run
+
+    timer_file = auto_mod.SYSTEMD_USER_DIR / auto_mod.TIMER_NAME
+    if timer_file.exists():
+        if dry:
+            actions.append(f"would disable + remove {auto_mod.TIMER_NAME}")
+        else:
+            try:
+                actions.extend(auto_mod.disable_timer())
+            except Exception as e:  # noqa: BLE001 — best-effort cleanup
+                actions.append(f"WARN: auto disable failed: {e}")
+
+    if dry:
+        bundled_dir = registry.PKG_ROOT / "themes"
+        for colors in bundled_dir.glob("*/*.colors"):
+            link = registry.KDE_SCHEMES_DIR / colors.name
+            if link.exists() or link.is_symlink():
+                actions.append(f"would remove {link}")
+    else:
+        for path in apply_mod.unlink_bundled_schemes():
+            actions.append(f"removed {path}")
+
+    if dry:
+        actions.append("would remove Konsole Kolour{A,B}.profile + bundled .colorscheme files")
+    else:
+        actions.extend(konsole_mod.remove())
+
+    if dry:
+        actions.append("would remove managed GTK kolour.css + import lines")
+    else:
+        actions.extend(gtk_mod.remove())
+
+    if args.purge:
+        if state.CONFIG_DIR.exists():
+            if dry:
+                actions.append(f"would remove {state.CONFIG_DIR} (purge)")
+            else:
+                shutil.rmtree(state.CONFIG_DIR)
+                actions.append(f"removed {state.CONFIG_DIR}")
+    else:
+        if state.STATE_FILE.is_file():
+            if dry:
+                actions.append(f"would remove {state.STATE_FILE}")
+            else:
+                state.remove()
+                actions.append(f"removed {state.STATE_FILE}")
+
+    if not actions:
+        print("nothing to clean up")
+        return 0
+    _print_actions(actions, args.verbose)
+    if not args.verbose:
+        prefix = "would " if dry else ""
+        print(f"{prefix}clean: {len(actions)} action(s)")
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     s = state.read()
     print(f"current scheme : {apply_mod.current_scheme() or '(unset)'}")
@@ -286,6 +349,16 @@ def build_parser() -> argparse.ArgumentParser:
     uninstall_p = sub.add_parser("uninstall", help="remove a user-installed scheme")
     uninstall_p.add_argument("name")
     uninstall_p.set_defaults(func=cmd_uninstall)
+
+    reset_p = sub.add_parser(
+        "reset",
+        help="undo kolour's system-level changes (timer, GTK, Konsole, scheme symlinks, state)",
+    )
+    reset_p.add_argument("--dry-run", action="store_true",
+                         help="show what would be removed without touching the filesystem")
+    reset_p.add_argument("--purge", action="store_true",
+                         help="also remove ~/.config/kolour/ entirely (including user-installed themes)")
+    reset_p.set_defaults(func=cmd_reset)
 
     matu_p = sub.add_parser("matugen", help="generate Material You from current wallpaper")
     matu_p.add_argument("--wallpaper", help="path to image; defaults to current Plasma wallpaper")
