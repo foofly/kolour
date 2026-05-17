@@ -52,6 +52,9 @@ class KolourApp(App):
     """
 
     BINDINGS = [
+        # Tree consumes `enter` for its own NodeSelected dispatch (handled in
+        # on_tree_node_selected below), so this binding never fires — kept
+        # only so "enter Apply" shows in the Footer.
         Binding("enter", "apply", "Apply"),
         Binding("a", "apply", "Apply", show=False),
         Binding("r", "refresh", "Refresh"),
@@ -120,8 +123,13 @@ class KolourApp(App):
                         current_node = node
 
         if current_node is not None:
+            # move_cursor (not select_node) — the latter fires NodeSelected,
+            # which would auto-apply the current scheme on mount.
             try:
-                tree.select_node(current_node)
+                tree.move_cursor(current_node)
+            except AttributeError:
+                pass
+            try:
                 tree.scroll_to_node(current_node)
             except Exception:
                 pass
@@ -138,6 +146,11 @@ class KolourApp(App):
     def on_tree_node_highlighted(self, event: Tree.NodeHighlighted) -> None:
         data = event.node.data
         self.selected = data if isinstance(data, registry.Theme) else None
+
+    def on_tree_node_selected(self, event: Tree.NodeSelected) -> None:
+        data = event.node.data
+        if isinstance(data, registry.Theme) and not self.busy:
+            self._do_apply(data)
 
     def watch_selected(self, theme: registry.Theme | None) -> None:
         if not self.is_mounted:
