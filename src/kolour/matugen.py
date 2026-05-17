@@ -3,12 +3,13 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
 
 from . import apply as apply_mod
-from . import host, registry, wallpaper
+from . import registry, wallpaper
 
 TEMPLATE = registry.PKG_ROOT / "matugen-templates" / "kde.colors"
 OUTPUT_NAME = "MaterialYou.colors"
@@ -23,7 +24,7 @@ class WallpaperMissing(RuntimeError):
 
 
 def available() -> bool:
-    return host.which("matugen") is not None
+    return shutil.which("matugen") is not None
 
 
 def _write_matugen_config(output_path: Path) -> Path:
@@ -75,7 +76,7 @@ def generate_and_apply(
         result.actions.append(f"would apply MaterialYou (output: {output})")
         return result
     try:
-        proc = host.run(cmd, check=True, capture_output=True, text=True)
+        proc = subprocess.run(cmd, check=True, capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
         raise RuntimeError(
             f"matugen failed: {e.stderr.strip() or e.stdout.strip() or e}"

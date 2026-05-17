@@ -9,7 +9,6 @@ from pathlib import Path
 from . import apply as apply_mod
 from . import auto as auto_mod
 from . import gtk as gtk_mod
-from . import host
 from . import konsole as konsole_mod
 from . import matugen as matugen_mod
 from . import registry, state
@@ -244,8 +243,8 @@ def cmd_status(args: argparse.Namespace) -> int:
     s = state.read()
     print(f"current scheme : {apply_mod.current_scheme() or '(unset)'}")
     print(f"saved accent   : {s.get('accent', '(none)')}")
-    konsole_ok = host.which("konsole") is not None
-    matugen_ok = host.which("matugen") is not None
+    konsole_ok = shutil.which("konsole") is not None
+    matugen_ok = shutil.which("matugen") is not None
     print(f"konsole        : {'available' if konsole_ok else 'not installed'}")
     print(f"matugen        : {'available' if matugen_ok else 'not installed'}")
     print(f"bundled themes : {len(registry.all())}")
