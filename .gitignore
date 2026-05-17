@@ -25,8 +25,3 @@ htmlcov/
 *.swp
 *.swo
 .DS_Store
-
-# Flatpak build artefacts
-build-flatpak/
-.flatpak-builder/
-repo/

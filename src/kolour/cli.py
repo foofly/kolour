@@ -77,20 +77,21 @@ def cmd_apply(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_gui(args: argparse.Namespace) -> int:
+def cmd_tui(args: argparse.Namespace) -> int:
     try:
-        from .gui.app import run
+        from .tui.app import KolourApp
     except ImportError as e:
         print(
-            "PySide6 not installed. Install with:\n"
-            "  pipx install 'kolour[gui]'\n"
+            "Textual not installed. Install with:\n"
+            "  pipx install 'kolour[tui]'\n"
             "or:\n"
-            "  pip install --user PySide6\n"
+            "  pip install --user textual\n"
             f"(import error: {e})",
             file=sys.stderr,
         )
         return 1
-    return run()
+    KolourApp().run()
+    return 0
 
 
 def cmd_install(args: argparse.Namespace) -> int:
@@ -264,7 +265,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("list", help="list available themes").set_defaults(func=cmd_list)
     sub.add_parser("current", help="print the active scheme").set_defaults(func=cmd_current)
     sub.add_parser("status", help="show kolour state").set_defaults(func=cmd_status)
-    sub.add_parser("gui", help="launch the PySide6 picker").set_defaults(func=cmd_gui)
+    sub.add_parser("tui", help="launch the terminal UI").set_defaults(func=cmd_tui)
 
     apply_p = sub.add_parser("apply", help="apply a theme")
     apply_p.add_argument("name")

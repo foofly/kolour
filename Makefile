@@ -2,7 +2,7 @@ PYTHON ?= python3
 SCHEME_DIR := $(HOME)/.local/share/color-schemes
 KONSOLE_DIR := $(HOME)/.local/share/konsole
 
-.PHONY: install install-gui link-schemes link-konsole unlink-schemes uninstall test gen-themes clean flatpak flatpak-install flatpak-run
+.PHONY: install install-tui link-schemes link-konsole unlink-schemes uninstall test gen-themes clean
 
 install:
 	@# pipx install --force silently no-ops on .py changes when the version is
@@ -11,9 +11,9 @@ install:
 	pipx install . || $(PYTHON) -m pip install --user --upgrade .
 	$(MAKE) link-schemes
 
-install-gui:
+install-tui:
 	-pipx uninstall kolour 2>/dev/null
-	pipx install '.[gui]' || $(PYTHON) -m pip install --user --upgrade '.[gui]'
+	pipx install '.[tui]' || $(PYTHON) -m pip install --user --upgrade '.[tui]'
 	$(MAKE) link-schemes
 
 link-schemes:
@@ -47,19 +47,5 @@ gen-themes:
 	$(PYTHON) tools/generate-colors.py
 
 clean:
-	rm -rf build dist *.egg-info src/*.egg-info .pytest_cache .flatpak-builder build-flatpak repo
+	rm -rf build dist *.egg-info src/*.egg-info .pytest_cache
 	find . -type d -name __pycache__ -exec rm -rf {} +
-
-# --- Flatpak --------------------------------------------------------------
-
-FLATPAK_APP_ID := io.github.foofly.kolour
-FLATPAK_MANIFEST := flatpak/$(FLATPAK_APP_ID).yml
-
-flatpak:
-	flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo build-flatpak $(FLATPAK_MANIFEST)
-
-flatpak-install:
-	flatpak-builder --force-clean --user --install --install-deps-from=flathub build-flatpak $(FLATPAK_MANIFEST)
-
-flatpak-run:
-	flatpak run $(FLATPAK_APP_ID) gui

@@ -1,8 +1,6 @@
 # kolour
 
-Quick KDE Plasma colour-scheme switcher with curated palettes, a PySide6 GUI, dark/light auto-follow, and Material You support.
-
-![Main window](docs/screenshots/main-window.png)
+Quick KDE Plasma colour-scheme switcher with curated palettes, a Textual TUI, dark/light auto-follow, and Material You support.
 
 ## Themes shipped
 
@@ -18,7 +16,7 @@ Quick KDE Plasma colour-scheme switcher with curated palettes, a PySide6 GUI, da
 ## Install
 
 ```sh
-make install-gui   # CLI + PySide6 GUI + symlinks bundled schemes
+make install-tui   # CLI + Textual TUI + symlinks bundled schemes
 # or, CLI only:
 make install
 ```
@@ -33,7 +31,7 @@ kolour current                 # print the active scheme name
 kolour apply Nord              # full swap: scheme + Konsole + GTK + matching Look-and-Feel
 kolour apply Catppuccin-Mocha --accent "#f5c2e7"
 kolour apply Sweet --no-lookandfeel    # keep your current Look-and-Feel
-kolour gui                     # PySide6 picker — list, swatches, accent picker, preview/apply/revert
+kolour tui                     # Textual terminal UI — browse themes by family and apply
 kolour matugen                 # generate Material You from current Plasma wallpaper
 kolour matugen --wallpaper /path/to/img.jpg --mode light
 kolour status                  # current scheme, accent, konsole/matugen availability
@@ -73,7 +71,7 @@ Disable per-call: `kolour apply Nord --no-konsole --no-gtk`.
 
 ## Bind a global shortcut
 
-System Settings → Shortcuts → Custom Shortcuts → New → Global → Command/URL: `kolour gui` (or `kolour auto toggle`).
+System Settings → Shortcuts → Custom Shortcuts → New → Global → Command/URL: `kolour auto toggle` (for a one-key dark/light flip).
 
 ## Troubleshooting
 
@@ -96,47 +94,23 @@ plasma-apply-lookandfeel --apply <pkg>   # e.g. Ant-Dark
 
 ### The pipx-installed `kolour` binary still has stale code after I edit a file
 
-`pipx install --force` skips reinstalling source files when the package version is unchanged. `make install` and `make install-gui` work around this by uninstalling first. If you call pipx directly:
+`pipx install --force` skips reinstalling source files when the package version is unchanged. `make install` and `make install-tui` work around this by uninstalling first. If you call pipx directly:
 
 ```sh
-pipx uninstall kolour && pipx install '.[gui]'
+pipx uninstall kolour && pipx install '.[tui]'
 ```
 
-### `kolour gui` fails with `ImportError: PySide6`
+### `kolour tui` fails with `ImportError: textual`
 
-Install with the GUI extra:
+Install with the TUI extra:
 
 ```sh
-pipx install '.[gui]'
+pipx install '.[tui]'
 ```
 
 ### `kolour matugen` says matugen isn't on PATH
 
 Install via your distro's package or `cargo install matugen`, then re-run.
-
-### Logging from the GUI
-
-Set `KOLOUR_LOG=DEBUG` (or `INFO` / `WARNING`) before launching to control verbosity:
-
-```sh
-KOLOUR_LOG=DEBUG kolour gui 2>~/kolour.log
-```
-
-## Flatpak (experimental)
-
-A Flatpak manifest lives under `flatpak/`. kolour is unusual for a Flatpak: it's a system-administration tool, so every host call (KDE binaries, D-Bus, systemd) escapes the sandbox via `flatpak-spawn --host`. The Flatpak gives you distribution and a desktop entry, not security isolation.
-
-Build + install locally:
-
-```sh
-make flatpak-install     # needs flatpak-builder; pulls org.kde.{Platform,Sdk}//6.10
-make flatpak-run         # launches the GUI
-```
-
-Caveats:
-- `matugen` must be installed on the host (the sandbox can't bundle it usefully — it'd run inside the sandbox without access to the host's wallpaper file).
-- The bundled `.colors` files are copied into `~/.local/share/color-schemes/` on first apply (instead of symlinked) so they remain reachable when the Flatpak is uninstalled or upgraded.
-- Flathub submission would need a real icon (the bundled SVG is a placeholder), screenshots, AppStream validation, and a maintained release tag — out of scope for the initial drop.
 
 ## Theme attribution
 
@@ -149,7 +123,7 @@ Palettes are YAML; the generator does the rest.
 1. Add `tools/palettes/<Name>.yaml` (copy any existing one as a starting point — see `tools/palettes/Nord.yaml`).
 2. `make gen-themes` regenerates `.colors`, the matching Konsole `.colorscheme`, and the GTK CSS for every YAML.
 3. `make link-schemes` symlinks the new `.colors` into `~/.local/share/color-schemes/`.
-4. `make install-gui` (or `pipx uninstall kolour && pipx install '.[gui]'`) so the package picks up the new file.
+4. `make install-tui` (or `pipx uninstall kolour && pipx install '.[tui]'`) so the package picks up the new file.
 
 ## Project layout
 
@@ -167,7 +141,7 @@ kolour/
 │   ├── registry.py       theme discovery + name resolution
 │   ├── state.py          ~/.config/kolour/state.toml
 │   ├── wallpaper.py      Plasma wallpaper detection
-│   ├── gui/              PySide6 main window, tree model, swatch widget
+│   ├── tui/              Textual app, swatch widget
 │   ├── themes/           bundled .colors files (one dir per family)
 │   ├── konsole/          matching Konsole .colorscheme files
 │   ├── gtk/              matching GTK colour overrides
