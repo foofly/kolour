@@ -9,6 +9,15 @@ One apply call sets the Plasma colour scheme, the Konsole profile, the GTK
 3/4 overrides, and (where needed) the Plasma Look-and-Feel — so the swap is
 visible everywhere, not just in KDE apps.
 
+## Requirements
+
+- **KDE Plasma 6** — kolour drives Plasma via its host binaries:
+  `plasma-apply-colorscheme`, `plasma-apply-lookandfeel`, `kreadconfig6`,
+  `kwriteconfig6`. They ship with Plasma 6.
+- **Python 3.11+**.
+- **Optional:** [matugen](https://github.com/InioX/matugen) on `$PATH` for
+  Material You generation; Konsole for terminal colour propagation.
+
 ## Themes shipped
 
 - **Nord**
@@ -68,6 +77,9 @@ kolour apply Sweet --no-lookandfeel               # keep your current L&F
 kolour matugen                                    # Material You from current Plasma wallpaper
 kolour matugen --wallpaper /path/to/img.jpg --mode light
 kolour status                                     # current scheme, accent, tool availability
+kolour reload-konsole                             # force running Konsole sessions to re-read the profile
+kolour install /path/to/scheme.colors             # add a third-party .colors file
+kolour uninstall <Name>                           # remove a user-installed scheme
 ```
 
 Global flags: `--no-konsole`, `--no-gtk`, `--no-lookandfeel`, `--dry-run`,
@@ -106,11 +118,12 @@ the standard pipeline.
 ## Konsole + GTK
 
 - **Konsole** — a matching `.colorscheme` is copied into
-  `~/.local/share/konsole/` and a managed `Kolour.profile` is set as the
-  default. Running sessions are nudged via D-Bus to re-read the profile.
-  Some session managers don't always honour the nudge — `kolour
-  reload-konsole` forces it, and reopening a window is always a safe
-  fallback.
+  `~/.local/share/konsole/` and one of two managed profiles
+  (`KolourA.profile` / `KolourB.profile`) is set as the default. The two
+  names rotate on each apply because Konsole caches profile metadata by
+  name and won't re-read a profile of the same name. Running sessions are
+  then nudged via D-Bus; if that doesn't take, `kolour reload-konsole`
+  forces it, and reopening a window is always a safe fallback.
 - **GTK 3 / GTK 4** — a managed `kolour.css` is dropped under
   `~/.config/gtk-{3,4}.0/` and `@import`-ed from your existing
   `colors.css`, so any GTK customisation you already had is preserved.
